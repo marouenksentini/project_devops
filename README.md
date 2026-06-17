@@ -1,41 +1,41 @@
-# DevOps Project: 3-Tier Containerized Application
+# Projet DevOps : Application Conteneurisée à 3 Niveaux (3-Tier)
 
-This repository contains a fully containerized 3-tier web application architecture orchestrated using **Docker Compose**. The infrastructure isolates backend services while exposing a secure reverse proxy to the host machine.
-
----
-
-## 🎯 Objectives
-* **Containerization:** Package the frontend, backend, and database components into lightweight, independent Docker containers.
-* **Network Isolation:** Establish a secure, dedicated private virtual bridge network (`bridge_default`) to isolate backend data from public traffic.
-* **Service Discovery:** Utilize Docker's internal embedded DNS server to route service-to-service communication dynamically by service name rather than unstable IP addresses.
+Ce dépôt contient une architecture d'application web à 3 niveaux entièrement conteneurisée et orchestrée avec **Docker Compose**. L'infrastructure isole les services backend tout en exposant un reverse proxy sécurisé vers la machine hôte.
 
 ---
 
-## 🏗️ Architecture Overview
+## 🎯 Objectifs
+* **Conteneurisation :** Packager les composants frontend, backend et base de données dans des conteneurs Docker légers et indépendants.
+* **Isolation Réseau :** Mettre en place un réseau virtuel privé et dédié de type bridge (`bridge_default`) pour isoler les données du backend du trafic public.
+* **Découverte de Services (Service Discovery) :** Utiliser le serveur DNS interne de Docker pour router la communication entre services de manière dynamique via leur nom de service, plutôt qu'avec des adresses IP instables.
 
-The cluster consists of three main services running inside an isolated Docker network:
+---
 
-| Service Name | Technology | Network Type | External Port | Internal Port |
+## 🏗️ Aperçu de l'Architecture
+
+Le cluster est composé de trois services principaux s'exécutant au sein d'un réseau Docker isolé :
+
+| Nom du Service | Technologie | Type de Réseau | Port Externe | Port Interne |
 | :--- | :--- | :--- | :--- | :--- |
-| `frontend-devops` | Nginx (Alpine) | Public / Internal Bridge | `80` | `80` |
-| `backend-devops` | Java (Spring Boot) | Internal Bridge Only | *None* | `8080` |
-| `mysql-devops` | MySQL 8.0 | Internal Bridge Only | *None* | `3306` |
+| `frontend-devops` | Nginx (Alpine) | Public / Bridge Interne | `80` | `80` |
+| `backend-devops` | Java (Spring Boot) | Bridge Interne Uniquement | *Aucun* | `8080` |
+| `mysql-devops` | MySQL 8.0 | Bridge Interne Uniquement | *Aucun* | `3306` |
 
-### Network Traffic Flow
-1. **Client to Frontend:** The user accesses the application externally via `http://localhost:80`.
-2. **Frontend to Backend:** Nginx acts as a **Reverse Proxy**. It catches incoming `/api/` traffic and forwards it internally to `http://backend-devops:8080/` using Docker's internal DNS. This natively resolves Cross-Origin Resource Sharing (CORS) complications.
-3. **Backend to Database:** The Spring Boot application communicates securely with the database layer using the internal URL `jdbc:mysql://mysql-devops:3306/`.
+### Flux du Trafic Réseau
+1. **Du Client au Frontend :** L'utilisateur accède à l'application depuis l'extérieur via `http://localhost:80`.
+2. **Du Frontend au Backend :** Nginx agit comme un **Reverse Proxy**. Il intercepte le trafic entrant `/api/` et le redirige en interne vers `http://backend-devops:8080/` grâce au DNS interne de Docker. Cela résout nativement les complications liées au CORS (Cross-Origin Resource Sharing).
+3. **Du Backend à la Base de Données :** L'application Spring Boot communique de manière sécurisée avec la couche de données en utilisant l'URL interne `jdbc:mysql://mysql-devops:3306/`.
 
 ---
 
-## 🚀 How to Use
+## 🚀 Guide d'Utilisation
 
-### Prerequisites
-Make sure you have the following installed on your machine:
-* [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows/Mac) or Docker Engine (Linux)
+### Prérequis
+Assurez-vous que les outils suivants sont installés sur votre machine :
+* [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows/Mac) ou Docker Engine (Linux)
 * Docker Compose V2
 
-### 1. Clone the Repository
+### 1. Cloner le Dépôt
 ```bash
 git clone [https://github.com/marouenksentini/project_devops.git](https://github.com/marouenksentini/project_devops.git)
 cd project_devops

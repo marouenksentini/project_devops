@@ -1,5 +1,8 @@
 target/
 .idea/
 *.iml
-.env
 node_modules/
+
+# Hide environment secret files and local configurations
+.env
+application.properties

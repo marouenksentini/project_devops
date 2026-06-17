@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>DevOps Target Validation - Ahmed Marouen Ksentini</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; text-align: center; margin: 30px 0; background: #f0f2f5; color: #333; }
+        .container { max-width: 700px; margin: 0 auto; background: white; padding: 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        
+        /* Fiche Étudiant Épurée */
+        .student-card { background: #e3f2fd; padding: 18px; border-radius: 8px; margin-bottom: 25px; border-left: 6px solid #1976d2; text-align: left; }
+        .student-card p { margin: 6px 0; font-size: 14px; }
+        .badge { background: #1976d2; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+        
+        h1 { color: #1e3a8a; font-size: 26px; margin-bottom: 20px; font-weight: 700; }
+        
+        /* Status Box */
+        .status { padding: 20px; background: #f8fafc; border-radius: 8px; margin: 20px 0; border: 1px solid #e2e8f0; }
+        .error { background: #ffebee !important; border: 1px solid #ffcdd2 !important; }
+        
+        /* Tableau Technique Réseau */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; text-align: left; font-size: 13px; }
+        th, td { padding: 10px; border-bottom: 1px solid #e2e8f0; }
+        th { background: #f1f5f9; color: #475569; font-weight: 600; }
+        
+        /* Métriques Temps Réel */
+        .metrics-grid { display: flex; justify-content: space-between; margin-top: 15px; padding: 10px; background: #ffffff; border-radius: 6px; border: 1px solid #e2e8f0; }
+        .metric-item { text-align: center; flex: 1; }
+        .metric-value { font-size: 16px; font-weight: bold; color: #0f172a; margin-top: 4px; }
+        
+        hr { border: 0; height: 1px; background: #e2e8f0; margin: 20px 0; }
+        .status-text { font-size: 16px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="student-card">
+            <p><strong>👨‍💻 Candidat :</strong> Marouen Ksentini <span class="badge">Auteur</span></p>
+            <p><strong>🎓 Parcours :</strong> Master Professionnel DSIR (Systèmes Informatiques & Réseaux)</p>
+            <p><strong>🏫 Institution :</strong> ISET Sfax</p>
+            <p><strong>⚙️ Module :</strong> Orchestration & Conteneurisation (Docker & Compose)</p>
+        </div>
+
+        <h1>🐳 Dashboard de Déploiement Micro-services</h1>
+        
+        <div class="status" id="status-box">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Image Docker</th>
+                        <th>Réseau Interne</th>
+                        <th>Port Externe</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Frontend (Proxy)</strong></td>
+                        <td><code>nginx:alpine</code></td>
+                        <td><code>bridge_default</code></td>
+                        <td><code>80 -> 80</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Backend API</strong></td>
+                        <td><code>project_devops-backend</code></td>
+                        <td><code>bridge_default</code></td>
+                        <td><code>8080 -> 8080</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Database Engine</strong></td>
+                        <td><code>mysql:8.0</code></td>
+                        <td><code>bridge_default</code></td>
+                        <td><code>3306 -> 3306</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <hr>
+
+            <p class="status-text" id="api-status">🔄 Requête d'interconnexion réseau en cours...</p>
+            <p id="api-message" style="font-style: italic; color: #475569; margin: 5px 0;"></p>
+            
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div style="font-size: 11px; color: #64748b;">Passerelle Proxy</div>
+                    <div class="metric-value" style="color: #2563eb;">Nginx Reverse</div>
+                </div>
+                <div class="metric-item" style="border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0;">
+                    <div style="font-size: 11px; color: #64748b;">Latence API</div>
+                    <div class="metric-value" id="metric-latency">-- ms</div>
+                </div>
+                <div class="metric-item">
+                    <div style="font-size: 11px; color: #64748b;">Protocole</div>
+                    <div class="metric-value" style="font-size: 13px; color: #0d9488;">HTTP/1.1 JSON</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mesure précise de la performance réseau du cluster Docker
+        const startTime = performance.now();
+
+        fetch('/api/health')
+            .then(r => {
+                if (!r.ok) throw new Error("Erreur Réseau: " + r.status);
+                return r.json();
+            })
+            .then(data => {
+                const duration = (performance.now() - startTime).toFixed(1);
+                document.getElementById('metric-latency').innerText = duration + ' ms';
+                
+                document.getElementById('api-status').innerText = '🟢 INFRASTRUCTURE ONLINE (API: ' + data.status + ')';
+                document.getElementById('api-status').style.color = '#16a34a';
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('api-status').innerText = '🔴 INTEGRATION LINK CRITICAL: OFFLINE';
+                document.getElementById('status-box').classList.add('error');
+                document.getElementById('api-status').style.color = '#dc2626';
+                document.getElementById('metric-latency').innerText = 'TIMEOUT';
+                document.getElementById('metric-latency').style.color = '#dc2626';
+            });
+            
+        fetch('/api/hello')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('api-message').innerText = '📡 Réponse Backend : "' + data.message + '"';
+            })
+            .catch(err => console.error(err));
+    </script>
+</body>
+</html>
